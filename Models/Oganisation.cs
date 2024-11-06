@@ -1,7 +1,8 @@
 namespace simpleRestApi.Models{
     public partial class Organisation
 {
-    public long UserId { get; set; }
+     public int Id { get; set; }
+    public int UserId { get; set; }
     public string Name { get; set; }
     public string StreetNumber { get; set; }
     public string StreetName { get; set; }

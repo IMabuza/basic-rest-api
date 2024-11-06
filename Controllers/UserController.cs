@@ -10,26 +10,42 @@ namespace simpleRestApi.Controllers;
 public class UserController : ControllerBase
 {
 
-    DataContextDapper _dapper;
+    DataContextEF _ef;
     public UserController(IConfiguration config){
-        _dapper = new DataContextDapper(config);
+        _ef = new DataContextEF(config);
     }
 
     [HttpGet("GetUsers")]
     public IEnumerable<User> GetUsers()
     {
-        return _dapper.LoadData<User>("SELECT * FROM dbo.Users");
+        return _ef.Users.ToList<User>();
     }
 
       [HttpGet("GetSingleUser/{userId}")]
     public User GetSingleUser(int userId)
     {
-        return _dapper.LoadDataSingle<User>($"SELECT * FROM dbo.Users WHERE Id = {userId}");
+        User? user =  _ef.Users.Where(u => u.Id == userId).FirstOrDefault<User>();
+
+        if(user != null){
+            return user;
+        }
+
+        throw new Exception("Failed to get user");
     }
 
       [HttpPost("AddUser")]
     public bool AddUser(UserDto user)
     {
-        return _dapper.Execute($"INSERT INTO dbo.Users([Name],[Surname],[Email]) VALUES('{user.Name}','{user.Surname}','{user.Email}')");
+        User newUser = new User();
+        
+        newUser.Name = user.Name;
+        newUser.Email = user.Email;
+        newUser.Surname = user.Surname;
+
+        _ef.Add(newUser);
+        if(_ef.SaveChanges() >  0){
+            return true;
+        }
+        return false;
     }
 }
