@@ -1,4 +1,4 @@
-namespace simpleRestApi{
+namespace simpleRestApi.Models{
     public partial class Organisation
 {
     public long UserId { get; set; }

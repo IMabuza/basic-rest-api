@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using simpleRestApi.Data;
+using simpleRestApi.Models;
 
 namespace simpleRestApi.Controllers;
 
@@ -14,8 +16,20 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("GetUsers")]
-    public string[] GetUsers()
+    public IEnumerable<User> GetUsers()
     {
-        return new[] { "test", "test2" };
+        return _dapper.LoadData<User>("SELECT * FROM dbo.Users");
+    }
+
+      [HttpGet("GetSingleUser/{userId}")]
+    public User GetSingleUser(int userId)
+    {
+        return _dapper.LoadDataSingle<User>($"SELECT * FROM dbo.Users WHERE Id = {userId}");
+    }
+
+      [HttpPost("AddUser")]
+    public bool AddUser(UserDto user)
+    {
+        return _dapper.Execute($"INSERT INTO dbo.Users([Name],[Surname],[Email]) VALUES('{user.Name}','{user.Surname}','{user.Email}')");
     }
 }
