@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using simpleRestApi.Data;
 using simpleRestApi.Models;
@@ -11,8 +12,12 @@ public class UserController : ControllerBase
 {
 
     DataContextEF _ef;
+    IMapper _mapper;
     public UserController(IConfiguration config){
         _ef = new DataContextEF(config);
+        _mapper = new Mapper(new MapperConfiguration(cfg => {
+            cfg.CreateMap<UserDto, User>();
+        }));
     }
 
     [HttpGet("GetUsers")]
@@ -36,11 +41,7 @@ public class UserController : ControllerBase
       [HttpPost("AddUser")]
     public bool AddUser(UserDto user)
     {
-        User newUser = new User();
-        
-        newUser.Name = user.Name;
-        newUser.Email = user.Email;
-        newUser.Surname = user.Surname;
+        User newUser = _mapper.Map<User>(user);
 
         _ef.Add(newUser);
         if(_ef.SaveChanges() >  0){
