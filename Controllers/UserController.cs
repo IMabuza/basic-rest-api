@@ -1,6 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using simpleRestApi.Data;
+using simpleRestApi.Dtos.User;
 using simpleRestApi.Interfaces;
 using simpleRestApi.Models;
 
@@ -12,11 +12,9 @@ namespace simpleRestApi.Controllers;
 public class UserController : ControllerBase
 {
 
-    DataContextEF _ef;
     IUserRepository _userRepository;
     IMapper _mapper;
-    public UserController(IConfiguration config, IUserRepository userRepository){
-        _ef = new DataContextEF(config);
+    public UserController(IUserRepository userRepository){
 
         _userRepository = userRepository;
         _mapper = new Mapper(new MapperConfiguration(cfg => {
@@ -33,7 +31,7 @@ public class UserController : ControllerBase
       [HttpGet("GetSingleUser/{userId}")]
     public User GetSingleUser(int userId)
     {
-        User? user =  _ef.Users.Where(u => u.Id == userId).FirstOrDefault<User>();
+        User? user = _userRepository.GetUser(userId);
 
         if(user != null){
             return user;
@@ -43,10 +41,9 @@ public class UserController : ControllerBase
     }
 
       [HttpPost("AddUser")]
-    public bool AddUser(UserDto user)
+    public bool AddUser(UserDto userDto)
     {
-        User newUser = _mapper.Map<User>(user);
-
+        User newUser = _mapper.Map<User>(userDto);
         _userRepository.Add(newUser);
         if(_userRepository.Save()){
             return true;

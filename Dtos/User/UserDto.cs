@@ -1,4 +1,4 @@
-namespace simpleRestApi{
+namespace simpleRestApi.Dtos.User{
     public partial class UserDto
 {
     public string Name { get; set; }

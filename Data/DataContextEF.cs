@@ -23,6 +23,8 @@ namespace simpleRestApi.Data
 
         public DbSet<Organisation> Organisations { get; set; }
 
+        public DbSet<Auth> Auth{ get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()

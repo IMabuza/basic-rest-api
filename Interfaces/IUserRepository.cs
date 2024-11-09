@@ -5,8 +5,9 @@ namespace simpleRestApi.Interfaces{
          public bool Save();
          public void Add<UserDto>(UserDto user);
          public void Remove<UserDto>(UserDto user);
-
           public IEnumerable<User> GetUsers();
+
+          public User? GetUser(int userId);
          
     }
 }

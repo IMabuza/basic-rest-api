@@ -13,27 +13,37 @@ namespace simpleRestApi.Repositories
 
         }
 
-        public bool Save(){
+        public bool Save()
+        {
             return _ef.SaveChanges() > 0;
         }
 
-         public void Add<UserDto>(UserDto user){
-            if(user != null){
-                  _ef.Add(user);
+        public void Add<UserDto>(UserDto user)
+        {
+            if (user != null)
+            {
+                _ef.Add(user);
             }
-      
+
         }
 
-          public void Remove<UserDto>(UserDto user){
-            if(user != null){
-                  _ef.Remove(user);
+        public void Remove<UserDto>(UserDto user)
+        {
+            if (user != null)
+            {
+                _ef.Remove(user);
             }
-      
+
         }
 
-         public IEnumerable<User> GetUsers()
-    {
-        return _ef.Users.ToList<User>();
-    }
+        public IEnumerable<User> GetUsers()
+        {
+            return _ef.Users.ToList<User>();
+        }
+
+        public User? GetUser(int userId){
+
+             return _ef.Users.Where(u => u.Id == userId).FirstOrDefault<User>() ?? null;
+        }
     }
 }
