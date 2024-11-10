@@ -34,6 +34,9 @@ namespace simpleRestApi.Data
             modelBuilder.Entity<Organisation>()
             .ToTable("Organisations")
             .HasKey(u => u.Id);
+
+            modelBuilder.Entity<Auth>()
+            .HasKey(a => a.Email);
         }
     }
 }
