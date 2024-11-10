@@ -41,7 +41,7 @@ namespace simpleRestApi.Controllers
 
             byte[] hash = _authService.GetPasswordHash(userRegistrationDto.Password, passwordSalt);
 
-            if (!_authService.SaveHashedUser(userRegistrationDto.Email, hash, passwordSalt))
+            if (!_authService.SaveHashedUser(hash, passwordSalt, userRegistrationDto))
             {
                 throw new Exception("Failed to register user");
             };
@@ -67,7 +67,6 @@ namespace simpleRestApi.Controllers
                    return StatusCode(401, "Incorrect password");
                 }
             }
-
             return Ok();
         }
     }
