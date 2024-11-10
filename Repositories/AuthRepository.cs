@@ -31,8 +31,12 @@ namespace simpleRestApi.Repositories
 
         public bool UserExists(string email)
         {
-            Auth? authUser = _ef.Auth.Where(au => au.Email == email).FirstOrDefault<Auth>();
+            Auth? authUser = this.GetAuthUser(email);
             return authUser != null;
+        }
+
+        public Auth? GetAuthUser(string email){
+             return _ef.Auth.Where(au => au.Email == email).FirstOrDefault<Auth>();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using simpleRestApi.Dtos.User;
 using simpleRestApi.Interfaces;
+using simpleRestApi.Models;
 
 namespace simpleRestApi.Services
 {
@@ -16,22 +17,18 @@ namespace simpleRestApi.Services
             _config = config;
         }
 
-        public bool HashPassword(UserRegistrationDto userRegistrationDto)
+        public byte[] GetPasswordHash(string password, byte[] salt)
         {
-            byte[] passwordSalt = new byte[128/8];
-                using (RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create()){
-                    randomNumberGenerator.GetNonZeroBytes(passwordSalt);
-                }
 
                 string passwordSaltPlusString = _config.GetSection("AppSettings:PasswordKey")
-                .Value + Convert.ToBase64String(passwordSalt);
+                .Value + Convert.ToBase64String(salt);
 
-                byte[] passwordHash = KeyDerivation.Pbkdf2(password: userRegistrationDto.Password, 
+                byte[] passwordHash = KeyDerivation.Pbkdf2(password: password, 
                 salt: Encoding.ASCII.GetBytes(passwordSaltPlusString), 
                 prf: KeyDerivationPrf.HMACSHA256, 
                 iterationCount: 100000, numBytesRequested: 256/8);
 
-                return _authRepository.SaveHashedUser(userRegistrationDto.Email, passwordHash, passwordSalt);
+                return passwordHash;
                 
         }
 
@@ -45,5 +42,14 @@ namespace simpleRestApi.Services
             return _authRepository.UserExists(email);
         }
 
+        public Auth? GetAuthUser(string email)
+        {
+           return  _authRepository.GetAuthUser(email);
+        }
+
+        public bool SaveHashedUser(string email, byte[] passwordHash, byte[] passwordSalt)
+        {
+               return _authRepository.SaveHashedUser(email, passwordHash, passwordSalt);
+        }
     }
 }

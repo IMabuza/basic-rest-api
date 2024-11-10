@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using simpleRestApi.Dtos.User;
 using simpleRestApi.Interfaces;
+using simpleRestApi.Models;
 
 namespace simpleRestApi.Controllers
 {
@@ -33,7 +34,14 @@ namespace simpleRestApi.Controllers
                 throw new Exception("User with this email already exists. Please login");
             }
 
-            if (!_authService.HashPassword(userRegistrationDto))
+            byte[] passwordSalt = new byte[128/8];
+                using (RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create()){
+                    randomNumberGenerator.GetNonZeroBytes(passwordSalt);
+                }
+
+            byte[] hash = _authService.GetPasswordHash(userRegistrationDto.Password, passwordSalt);
+
+            if (!_authService.SaveHashedUser(userRegistrationDto.Email, hash, passwordSalt))
             {
                 throw new Exception("Failed to register user");
             };
@@ -44,8 +52,22 @@ namespace simpleRestApi.Controllers
         }
 
         [HttpPost("Login")]
-        public IActionResult Login(UserLoginConfirmationDto userLoginConfirmationDto)
+        public IActionResult Login(UserLoginDto userLoginDto)
         {
+            //Get user
+            Auth? authUser = _authService.GetAuthUser(userLoginDto.Email);
+            if (authUser == null){
+                throw new Exception("User does not exist");
+            }
+
+            byte[] passwordHash = _authService.GetPasswordHash(userLoginDto.Password, authUser.PasswordSalt);
+
+            for(int i = 0; i < passwordHash.Length; i++){
+                if (passwordHash[i] != authUser.PasswordHash[i]){
+                   return StatusCode(401, "Incorrect password");
+                }
+            }
+
             return Ok();
         }
     }
