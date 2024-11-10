@@ -11,6 +11,8 @@ namespace simpleRestApi.Interfaces
 
         public Auth? GetAuthUser(string email);
 
-        public bool SaveHashedUser(byte[] passwordHash, byte[] passwordSalt, UserRegistrationDto userRegistrationDto);
+        public string? SaveHashedUser(byte[] passwordHash, byte[] passwordSalt, UserRegistrationDto userRegistrationDto);
+
+        public string? GetUserToken(string email);
     }
 }

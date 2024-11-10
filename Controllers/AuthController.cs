@@ -34,19 +34,21 @@ namespace simpleRestApi.Controllers
                 throw new Exception("User with this email already exists. Please login");
             }
 
-            byte[] passwordSalt = new byte[128/8];
-                using (RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create()){
-                    randomNumberGenerator.GetNonZeroBytes(passwordSalt);
-                }
+            byte[] passwordSalt = new byte[128 / 8];
+            using (RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create())
+            {
+                randomNumberGenerator.GetNonZeroBytes(passwordSalt);
+            }
 
             byte[] hash = _authService.GetPasswordHash(userRegistrationDto.Password, passwordSalt);
 
-            if (!_authService.SaveHashedUser(hash, passwordSalt, userRegistrationDto))
+            string? token = _authService.SaveHashedUser(hash, passwordSalt, userRegistrationDto);
+            if (token == null)
             {
                 throw new Exception("Failed to register user");
             };
 
-            return Ok();
+            return Ok(new Dictionary<string, string> { { "token", token } });
 
 
         }
@@ -56,18 +58,27 @@ namespace simpleRestApi.Controllers
         {
             //Get user
             Auth? authUser = _authService.GetAuthUser(userLoginDto.Email);
-            if (authUser == null){
+            if (authUser == null)
+            {
                 throw new Exception("User does not exist");
             }
 
             byte[] passwordHash = _authService.GetPasswordHash(userLoginDto.Password, authUser.PasswordSalt);
 
-            for(int i = 0; i < passwordHash.Length; i++){
-                if (passwordHash[i] != authUser.PasswordHash[i]){
-                   return StatusCode(401, "Incorrect password");
+            for (int i = 0; i < passwordHash.Length; i++)
+            {
+                if (passwordHash[i] != authUser.PasswordHash[i])
+                {
+                    return StatusCode(401, "Incorrect password");
                 }
             }
-            return Ok();
+
+            string? token = _authService.GetUserToken(userLoginDto.Email);
+            if (token == null)
+            {
+                throw new Exception("Failed to login user");
+            };
+            return Ok(new Dictionary<string, string> { { "token", token } });
         }
     }
 }

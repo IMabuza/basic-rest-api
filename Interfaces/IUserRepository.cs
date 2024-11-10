@@ -8,6 +8,8 @@ namespace simpleRestApi.Interfaces{
           public IEnumerable<User> GetUsers();
 
           public User? GetUser(int userId);
+
+          public User? GetUserByEmail(string email);
          
     }
 }

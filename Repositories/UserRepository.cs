@@ -45,5 +45,10 @@ namespace simpleRestApi.Repositories
 
              return _ef.Users.Where(u => u.Id == userId).FirstOrDefault<User>() ?? null;
         }
+
+        public User? GetUserByEmail(string email)
+        {
+             return _ef.Users.Where(u => u.Email == email).FirstOrDefault<User>() ?? null;
+        }
     }
 }
