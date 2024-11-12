@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using simpleRestApi.Dtos.User;
 using simpleRestApi.Interfaces;
@@ -6,21 +7,20 @@ using simpleRestApi.Models;
 
 namespace simpleRestApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
         IAuthService _authService;
-        // IMapper _mapper;
 
         public AuthController(IAuthService authService)
         {
             _authService = authService;
-            //        _mapper = new Mapper(new MapperConfiguration(cfg => {
-            //     cfg.CreateMap<UserRegistrationDto, Auth>();
-            // }));
+  
         }
 
+        [AllowAnonymous]
         [HttpPost("Register")]
         public IActionResult Register(UserRegistrationDto userRegistrationDto)
         {
@@ -53,6 +53,7 @@ namespace simpleRestApi.Controllers
 
         }
 
+        [AllowAnonymous]
         [HttpPost("Login")]
         public IActionResult Login(UserLoginDto userLoginDto)
         {
@@ -80,5 +81,19 @@ namespace simpleRestApi.Controllers
             };
             return Ok(new Dictionary<string, string> { { "token", token } });
         }
+
+           [HttpGet("RefreshToken")]
+           public IActionResult RefreshToken(){
+            string userId = User.FindFirst("userId")?.Value ?? "";
+
+           User? user =  _authService.GetUser(Int32.Parse(userId));
+
+           if (user != null){
+              string token =  _authService.CreateToken(user.Id);
+               return Ok(new Dictionary<string, string> { { "token", token } });
+           }
+
+              throw new Exception("Failed to refresh token");
+           }
     }
 }

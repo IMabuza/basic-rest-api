@@ -78,7 +78,7 @@ namespace simpleRestApi.Services
             return null;
         }
 
-        private string CreateToken(int userId)
+        public string CreateToken(int userId)
         {
             Claim[] claims = new Claim[] {
                 new Claim("userId", userId.ToString()),
@@ -113,6 +113,11 @@ namespace simpleRestApi.Services
                 return this.CreateToken(user.Id);
             }
             return null;
+        }
+
+        public User? GetUser(int userId)
+        {
+            return _userRepository.GetUser(userId);
         }
     }
 }
